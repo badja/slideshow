@@ -1,0 +1,257 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (United States) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)\r\n"
+    "LANGUAGE 9, 1\r\n"
+    "#pragma code_page(1252)\r\n"
+    "#include ""res\\SlideShow.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
+    "#include ""afxres.rc""         // Standard components\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON                    "res\\SlideShow.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_SLIDESHOW_DIALOG DIALOGEX 0, 0, 320, 198
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+EXSTYLE WS_EX_APPWINDOW
+CAPTION "Slide Show"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    LTEXT           "",IDC_PICTURE,7,7,305,184,SS_NOTIFY
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904e4"
+        BEGIN
+            VALUE "CompanyName", "Adrian Grucza"
+            VALUE "FileDescription", "Slide show application that allows each picture shown to be taken from a different folder"
+            VALUE "FileVersion", "1.0.0.1"
+            VALUE "InternalName", "SlideShow.exe"
+            VALUE "LegalCopyright", "(c) 2013 Adrian Grucza.  All rights reserved."
+            VALUE "OriginalFilename", "SlideShow.exe"
+            VALUE "ProductName", "Slide Show"
+            VALUE "ProductVersion", "1.0.0.1"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1252
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_SLIDESHOW_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 312
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 193
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+#endif    // English (United States) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// English (Australia) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENA)
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_AUS
+#pragma code_page(1252)
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Accelerator
+//
+
+IDR_ACCELERATOR_SLIDE_SHOW ACCELERATORS
+BEGIN
+    VK_F11,         ID_FULL_SCREEN,         VIRTKEY, NOINVERT
+    VK_DOWN,        ID_ITEMS_NEXT,          VIRTKEY, NOINVERT
+    VK_DOWN,        ID_ITEMS_NEXT_ALT,      VIRTKEY, SHIFT, NOINVERT
+    VK_RIGHT,       ID_SUBITEMS_NEXT,       VIRTKEY, NOINVERT
+    VK_RIGHT,       ID_SUBITEMS_NEXT_ALT,   VIRTKEY, SHIFT, NOINVERT
+    "O",            ID_OPEN_FOLDER,         VIRTKEY, CONTROL, NOINVERT
+    VK_SPACE,       ID_PLAY_PAUSE,          VIRTKEY, NOINVERT
+    VK_UP,          ID_ITEMS_PREVIOUS,      VIRTKEY, NOINVERT
+    VK_UP,          ID_ITEMS_PREVIOUS_ALT,  VIRTKEY, SHIFT, NOINVERT
+    VK_LEFT,        ID_SUBITEMS_PREVIOUS,   VIRTKEY, NOINVERT
+    VK_LEFT,        ID_SUBITEMS_PREVIOUS_ALT, VIRTKEY, SHIFT, NOINVERT
+    VK_RETURN,      ID_PROPERTIES,          VIRTKEY, ALT, NOINVERT
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MENU_POPUP MENU
+BEGIN
+    POPUP "Popup"
+    BEGIN
+        MENUITEM "&Open folder...\tCtrl+O",     ID_OPEN_FOLDER
+        MENUITEM "&Rescan folder",              ID_RESCAN_FOLDER
+        MENUITEM "&Close folder",               ID_CLOSE_FOLDER
+        MENUITEM SEPARATOR
+        MENUITEM "&Play\tSpace",                ID_PLAY
+        MENUITEM "&Pause\tSpace",               ID_PAUSE
+        MENUITEM "&Full screen\tF11",           ID_FULL_SCREEN
+        MENUITEM "Stretch to fit",              ID_STRETCH_TO_FIT
+        MENUITEM SEPARATOR
+        POPUP "Al&bums"
+        BEGIN
+            MENUITEM "&Shuffle",                    ID_ITEMS_SHUFFLE
+            MENUITEM "&Loop",                       ID_ITEMS_LOOP
+            MENUITEM SEPARATOR
+            MENUITEM "&Next\tDown arrow",           ID_ITEMS_NEXT
+            MENUITEM "&Previous\tUp arrow",         ID_ITEMS_PREVIOUS
+            MENUITEM "&Home",                       ID_ITEMS_HOME
+            MENUITEM "&Reshuffle",                  ID_ITEMS_RESHUFFLE
+        END
+        POPUP "P&hotos"
+        BEGIN
+            MENUITEM "&Shuffle",                    ID_SUBITEMS_SHUFFLE
+            MENUITEM "&Loop",                       ID_SUBITEMS_LOOP
+            MENUITEM SEPARATOR
+            MENUITEM "&Next\tRight arrow",          ID_SUBITEMS_NEXT
+            MENUITEM "&Previous\tLeft arrow",       ID_SUBITEMS_PREVIOUS
+            MENUITEM "&Home",                       ID_SUBITEMS_HOME
+            MENUITEM "&Reshuffle",                  ID_SUBITEMS_RESHUFFLE
+        END
+        POPUP "&All"
+        BEGIN
+            MENUITEM "&Home",                       ID_ALL_HOME
+            MENUITEM "&Reshuffle",                  ID_ALL_RESHUFFLE
+        END
+        MENUITEM SEPARATOR
+        MENUITEM "Slide Show - Alb&ums",            ID_SLIDE_SHOW_ITEMS
+        MENUITEM "Slide Show - Photo&s",            ID_SLIDE_SHOW_SUBITEMS
+        POPUP "Slide Show - Spee&d"
+        BEGIN
+            MENUITEM "&Slow",                       ID_SLIDE_SHOW_SPEED_SLOW
+            MENUITEM "&Medium",                     ID_SLIDE_SHOW_SPEED_MEDIUM
+            MENUITEM "&Fast",                       ID_SLIDE_SHOW_SPEED_FAST
+        END
+        MENUITEM SEPARATOR
+        MENUITEM "Ope&n file",                  ID_OPEN_FILE
+        MENUITEM "Open file &location",         ID_OPEN_FILE_LOCATION
+        MENUITEM "Proper&ties\tAlt+Enter",      ID_PROPERTIES
+        MENUITEM SEPARATOR
+        MENUITEM "&Exit\tEsc",                  ID_EXIT
+    END
+END
+
+#endif    // English (Australia) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE 9, 1
+#pragma code_page(1252)
+#include "res\SlideShow.rc2"  // non-Microsoft Visual C++ edited resources
+#include "afxres.rc"         // Standard components
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+
