@@ -19,7 +19,7 @@ END_MESSAGE_MAP()
 
 // CSlideShowApp construction
 
-CSlideShowApp::CSlideShowApp()
+CSlideShowApp::CSlideShowApp() noexcept
 {
 	m_pszAppName = _tcsdup(_T("Slide Show"));
 }
@@ -52,10 +52,10 @@ BOOL CSlideShowApp::InitInstance()
 	// such as the name of your company or organization
 //	SetRegistryKey(_T("Local AppWizard-Generated Applications"));
 
-	srand((unsigned)time(NULL));
+	srand(time(NULL) % UINT_MAX);
 
 	ULONG_PTR m_gdiplusToken;
-	GdiplusStartupInput gdiplusStartupInput;
+	const GdiplusStartupInput gdiplusStartupInput;
 	GdiplusStartup(&m_gdiplusToken, &gdiplusStartupInput, NULL);
 
 	CStdioFile SettingsFile;
@@ -63,14 +63,14 @@ BOOL CSlideShowApp::InitInstance()
 	if (!FileName.IsEmpty())
 		FileName += _T("\\Settings.bin");
 
-	CSlideShowDlg dlg;
+	CSlideShowDlg dlg(NULL);
 	m_pMainWnd = &dlg;
 	if (!FileName.IsEmpty() && SettingsFile.Open(FileName, CFile::modeRead | CFile::typeBinary | CFile::osSequentialScan))
 	{
 		dlg.LoadSettings(SettingsFile);
 		SettingsFile.Close();
 	}
-	INT_PTR nResponse = dlg.DoModal();
+	const INT_PTR nResponse = dlg.DoModal();
 	if (nResponse == IDOK)
 	{
 		// TODO: Place code here to handle when the dialog is
@@ -95,17 +95,18 @@ BOOL CSlideShowApp::InitInstance()
 
 CString CSlideShowApp::CreateSettingsFolder()
 {
-	TCHAR szPath[MAX_PATH];
+	TCHAR szPath[MAX_PATH]{};
+	LPTSTR pszPath = &szPath[0];
 
 	// Get path for each user, non-roaming data.
-	if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_LOCAL_APPDATA, NULL, 0, szPath)))
+	if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_LOCAL_APPDATA, NULL, 0, pszPath)))
 	{
 		// Append product-specific path
-		PathAppend(szPath, _T("\\Adrian Grucza"));
-		::CreateDirectory(szPath, 0);
-		PathAppend(szPath, _T("\\") + CString(AfxGetAppName()));
-		::CreateDirectory(szPath, 0);
+		PathAppend(pszPath, _T("\\Adrian Grucza"));
+		::CreateDirectory(pszPath, 0);
+		PathAppend(pszPath, _T("\\") + CString(AfxGetAppName()));
+		::CreateDirectory(pszPath, 0);
 	}
 
-	return szPath;
+	return pszPath;
 }

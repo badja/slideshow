@@ -10,12 +10,11 @@
 
 IMPLEMENT_SERIAL(CSlideShowItem, CObject, 1)
 
-CSlideShowItem::CSlideShowItem()
-{
-	Clear();
-}
+CSlideShowItem::CSlideShowItem() noexcept
+	: m_CurrentPosition(-1)
+	, m_UsingShuffle(FALSE)
+	, m_BackCount(0)
 
-CSlideShowItem::~CSlideShowItem()
 {
 }
 
@@ -93,7 +92,7 @@ BOOL CSlideShowItem::NextItem(int Level, BOOL Loop, BOOL LevelShuffle, BOOL SubL
 	else
 	{
 		// Return if there are no subitems
-		INT_PTR SubitemCount = m_Subitems.GetCount();
+		const INT_PTR SubitemCount = m_Subitems.GetCount();
 		if (SubitemCount == 0)
 			return FALSE;
 
@@ -144,7 +143,7 @@ BOOL CSlideShowItem::PreviousItem(int Level, BOOL Loop, BOOL LevelShuffle)
 	else
 	{
 		// Return if there are no subitems
-		INT_PTR SubitemCount = m_Subitems.GetCount();
+		const INT_PTR SubitemCount = m_Subitems.GetCount();
 		if (SubitemCount == 0)
 			return FALSE;
 
@@ -177,7 +176,7 @@ void CSlideShowItem::ResetBackCount()
 {
 	m_BackCount = 0;
 
-	INT_PTR SubitemsSize = m_Subitems.GetCount();
+	const INT_PTR SubitemsSize = m_Subitems.GetCount();
 
 	for (INT_PTR i = 0; i < SubitemsSize; i++)
 		m_Subitems[i].ResetBackCount();
@@ -195,7 +194,7 @@ BOOL CSlideShowItem::Home(int Level)
 	else
 	{
 		// Return if there are no subitems
-		INT_PTR SubitemCount = m_Subitems.GetCount();
+		const INT_PTR SubitemCount = m_Subitems.GetCount();
 		if (SubitemCount == 0)
 			return FALSE;
 
@@ -215,7 +214,7 @@ void CSlideShowItem::HomeAll()
 
 	m_CurrentPosition = -1;
 
-	INT_PTR SubitemsSize = m_Subitems.GetCount();
+	const INT_PTR SubitemsSize = m_Subitems.GetCount();
 
 	for (INT_PTR i = 0; i < SubitemsSize; i++)
 		m_Subitems[i].HomeAll();
@@ -242,7 +241,7 @@ void CSlideShowItem::ReshuffleAll()
 
 	ShufflePositions();
 
-	INT_PTR SubitemsSize = m_Subitems.GetCount();
+	const INT_PTR SubitemsSize = m_Subitems.GetCount();
 
 	for (INT_PTR i = 0; i < SubitemsSize; i++)
 		m_Subitems[i].ReshuffleAll();
@@ -271,7 +270,7 @@ BOOL CSlideShowItem::IsFirstItem(int Level)
 			return pItem->IsFirstItem(Level - 1);
 	}
 
-	INT_PTR Count = m_Subitems.GetCount();
+	const INT_PTR Count = m_Subitems.GetCount();
 	return Count == 0 || m_CurrentPosition <= 0;
 }
 
@@ -285,7 +284,7 @@ BOOL CSlideShowItem::IsLastItem(int Level)
 			return pItem->IsLastItem(Level - 1);
 	}
 
-	INT_PTR Count = m_Subitems.GetCount();
+	const INT_PTR Count = m_Subitems.GetCount();
 	return Count == 0 || m_CurrentPosition == (Count - 1);
 }
 
@@ -322,7 +321,7 @@ void CSlideShowItem::SetItem(CString Path, CString FileName, BOOL IsDirectory)
 			if (Finder.IsDots() || Finder.IsHidden())
 				continue;
 
-			INT_PTR PrevSize = m_Subitems.GetCount();
+			const INT_PTR PrevSize = m_Subitems.GetCount();
 			m_Subitems.SetSize(PrevSize + 1);
 			CSlideShowItem& Item = m_Subitems.GetAt(PrevSize);
 
@@ -338,8 +337,7 @@ void CSlideShowItem::SetItem(CString Path, CString FileName, BOOL IsDirectory)
 
 void CSlideShowItem::ShufflePositions()
 {
-	INT_PTR j;
-	INT_PTR SubitemsSize = m_Subitems.GetCount();
+	const INT_PTR SubitemsSize = m_Subitems.GetCount();
 
 	// If there are subitems, shuffle positions into m_ShuffledPositions
 	if (SubitemsSize > 0)
@@ -349,14 +347,14 @@ void CSlideShowItem::ShufflePositions()
 
 		for (INT_PTR i = 1; i < SubitemsSize; i++)
 		{
-			j = rand() % (i + 1);
+			const INT_PTR j = rand() % (i + 1);
 			m_ShuffledPositions[i] = m_ShuffledPositions[j];
 			m_ShuffledPositions[j] = i;
 		}
 	}
 }
 
-INT_PTR CSlideShowItem::GetCurrentPosition()
+INT_PTR CSlideShowItem::GetCurrentPosition() const noexcept
 {
 	return max(0, m_CurrentPosition);
 }

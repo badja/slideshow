@@ -17,7 +17,7 @@
 class CSlideShowApp : public CWinApp
 {
 public:
-	CSlideShowApp();
+	CSlideShowApp() noexcept;
 
 // Overrides
 	public:

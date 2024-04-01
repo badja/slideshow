@@ -14,10 +14,11 @@
 
 CSlideShowCtrl CSlideShowDlg::m_Picture;
 
-CSlideShowDlg::CSlideShowDlg(CWnd* pParent /*=NULL*/)
+CSlideShowDlg::CSlideShowDlg(CWnd* pParent)
 	: CDialog(CSlideShowDlg::IDD, pParent)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+	m_AccelTable = LoadAccelerators(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDR_ACCELERATOR_SLIDE_SHOW));
 }
 
 void CSlideShowDlg::DoDataExchange(CDataExchange* pDX)
@@ -139,7 +140,6 @@ BOOL CSlideShowDlg::OnInitDialog()
 	m_Picture.MoveWindow(0, 0, rect.Width(), rect.Height(), FALSE);
 	m_Picture.DisplayCurrentImage();
 
-	m_AccelTable = LoadAccelerators(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDR_ACCELERATOR_SLIDE_SHOW));
 	m_PopupMenu.LoadMenu(IDR_MENU_POPUP);
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
@@ -166,12 +166,12 @@ void CSlideShowDlg::OnPaint()
 		SendMessage(WM_ICONERASEBKGND, reinterpret_cast<WPARAM>(dc.GetSafeHdc()), 0);
 
 		// Center icon in client rectangle
-		int cxIcon = GetSystemMetrics(SM_CXICON);
-		int cyIcon = GetSystemMetrics(SM_CYICON);
+		const int cxIcon = GetSystemMetrics(SM_CXICON);
+		const int cyIcon = GetSystemMetrics(SM_CYICON);
 		CRect rect;
 		GetClientRect(&rect);
-		int x = (rect.Width() - cxIcon + 1) / 2;
-		int y = (rect.Height() - cyIcon + 1) / 2;
+		const int x = (rect.Width() - cxIcon + 1) / 2;
+		const int y = (rect.Height() - cyIcon + 1) / 2;
 
 		// Draw the icon
 		dc.DrawIcon(x, y, m_hIcon);
@@ -184,14 +184,14 @@ void CSlideShowDlg::OnPaint()
 
 // The system calls this function to obtain the cursor to display while the user drags
 //  the minimized window.
-HCURSOR CSlideShowDlg::OnQueryDragIcon()
+HCURSOR CSlideShowDlg::OnQueryDragIcon() noexcept
 {
-	return static_cast<HCURSOR>(m_hIcon);
+	return m_hIcon;
 }
 
 HBRUSH CSlideShowDlg::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 {
-	HBRUSH hbr = CDialog::OnCtlColor(pDC, pWnd, nCtlColor);
+	CDialog::OnCtlColor(pDC, pWnd, nCtlColor);
 
 	return m_Brush;
 }
@@ -217,7 +217,7 @@ void CSlideShowDlg::OnSize(UINT nType, int cx, int cy)
 void CSlideShowDlg::OnContextMenu(CWnd* pWnd, CPoint point)
 {
 	// If context menu key was pressed, use center-point of window instead
-	if (point.x < 0 && point.y < 0)
+	if (pWnd && point.x < 0 && point.y < 0)
 	{
 		CRect Rect;
 		pWnd->GetWindowRect(Rect);
@@ -244,7 +244,7 @@ void CSlideShowDlg::OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMen
 
 	// determine if menu is popup in top-level menu and set m_pOther to
 	//  it if so (m_pParentMenu == NULL indicates that it is secondary popup)
-	HMENU hParentMenu;
+	HMENU hParentMenu{};
 	if (AfxGetThreadState()->m_hTrackingMenu == pPopupMenu->m_hMenu)
 		state.m_pParentMenu = pPopupMenu;    // parent == child for tracking popup
 	else if ((hParentMenu = ::GetMenu(m_hWnd)) != NULL)
@@ -254,10 +254,10 @@ void CSlideShowDlg::OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMen
 		if (pParent != NULL &&
 			(hParentMenu = ::GetMenu(pParent->m_hWnd)) != NULL)
 		{
-			int nIndexMax = ::GetMenuItemCount(hParentMenu);
-			for (int nIndex = 0; nIndex < nIndexMax; nIndex++)
+			const int nPosMax = ::GetMenuItemCount(hParentMenu);
+			for (int nPos = 0; nPos < nPosMax; nPos++)
 			{
-				if (::GetSubMenu(hParentMenu, nIndex) == pPopupMenu->m_hMenu)
+				if (::GetSubMenu(hParentMenu, nPos) == pPopupMenu->m_hMenu)
 				{
 					// when popup is found, m_pParentMenu is containing menu
 					state.m_pParentMenu = CMenu::FromHandle(hParentMenu);
@@ -277,13 +277,13 @@ void CSlideShowDlg::OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMen
 
 		ASSERT(state.m_pOther == NULL);
 		ASSERT(state.m_pMenu != NULL);
-		if (state.m_nID == (UINT)-1)
+		if (state.m_nID == UINT_MAX)
 		{
 			// possibly a popup menu, route to first item of that popup
 			state.m_pSubMenu = pPopupMenu->GetSubMenu(state.m_nIndex);
 			if (state.m_pSubMenu == NULL ||
 				(state.m_nID = state.m_pSubMenu->GetMenuItemID(0)) == 0 ||
-				state.m_nID == (UINT)-1)
+				state.m_nID == UINT_MAX)
 			{
 				continue;       // first item of popup can't be routed to
 			}
@@ -299,7 +299,7 @@ void CSlideShowDlg::OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMen
 		}
 
 		// adjust for menu deletions and additions
-		UINT nCount = pPopupMenu->GetMenuItemCount();
+		const UINT nCount = pPopupMenu->GetMenuItemCount();
 		if (nCount < state.m_nIndexMax)
 		{
 			state.m_nIndex -= (state.m_nIndexMax - nCount);
@@ -319,11 +319,12 @@ void CSlideShowDlg::OnOpenFolder()
 	LPMALLOC pMalloc;
 	CString Path;
 	/* Gets the Shell's default allocator */
-	if (::SHGetMalloc(&pMalloc) == NOERROR)
+	if (::SHGetMalloc(&pMalloc) == NOERROR && pMalloc)
 	{
-		BROWSEINFO bi;
-		TCHAR pszBuffer[MAX_PATH];
-		LPITEMIDLIST pidl;
+		BROWSEINFO bi{};
+		TCHAR szBuffer[MAX_PATH]{};
+		LPTSTR pszBuffer = &szBuffer[0];
+		LPITEMIDLIST pidl{};
 		// Get help on BROWSEINFO struct - it's got all the bit settings.
 		bi.hwndOwner = GetSafeHwnd();
 		bi.pidlRoot = NULL;
@@ -409,7 +410,7 @@ void CSlideShowDlg::OnItemsShuffle()
 	m_Picture.SetShuffleItems(!m_Picture.GetShuffleItems());
 }
 
-void CSlideShowDlg::OnItemsLoop()
+void CSlideShowDlg::OnItemsLoop() noexcept
 {
 	m_Picture.SetLoopItems(!m_Picture.GetLoopItems());
 }
@@ -449,7 +450,7 @@ void CSlideShowDlg::OnSubitemsShuffle()
 	m_Picture.SetShuffleSubitems(!m_Picture.GetShuffleSubitems());
 }
 
-void CSlideShowDlg::OnSubitemsLoop()
+void CSlideShowDlg::OnSubitemsLoop() noexcept
 {
 	m_Picture.SetLoopSubitems(!m_Picture.GetLoopSubitems());
 }
@@ -494,12 +495,12 @@ void CSlideShowDlg::OnAllReshuffle()
 	m_Picture.ReshuffleAll();
 }
 
-void CSlideShowDlg::OnSlideShowItems()
+void CSlideShowDlg::OnSlideShowItems() noexcept
 {
 	m_Picture.SetSlideShowType(CSlideShowCtrl::Items);
 }
 
-void CSlideShowDlg::OnSlideShowSubitems()
+void CSlideShowDlg::OnSlideShowSubitems() noexcept
 {
 	m_Picture.SetSlideShowType(CSlideShowCtrl::Subitems);
 }
@@ -523,7 +524,7 @@ void CSlideShowDlg::OnOpenFile()
 {
 	CString strFileName = m_Picture.GetCurrentFileName();
 
-	SHELLEXECUTEINFO ExecInfo = {0};
+	static SHELLEXECUTEINFO ExecInfo;
 	ExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
 	ExecInfo.fMask = SEE_MASK_INVOKEIDLIST;
 	ExecInfo.lpVerb = _T("open");
@@ -536,7 +537,7 @@ void CSlideShowDlg::OnOpenFile()
 void CSlideShowDlg::OnOpenFileLocation()
 {
 	CString strParameters;
-	strParameters.Format(_T("/select,\"%s\""), m_Picture.GetCurrentFileName());
+	strParameters.Format(_T("/select,\"%s\""), m_Picture.GetCurrentFileName().GetString());
 
 	ShellExecute(0, _T("open"), _T("explorer.exe"), strParameters, 0, SW_NORMAL);
 }
@@ -545,7 +546,7 @@ void CSlideShowDlg::OnProperties()
 {
 	CString strFileName = m_Picture.GetCurrentFileName();
 
-	SHELLEXECUTEINFO ExecInfo = {0};
+	static SHELLEXECUTEINFO ExecInfo;
 	ExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
 	ExecInfo.fMask = SEE_MASK_INVOKEIDLIST;
 	ExecInfo.lpVerb = _T("properties");
@@ -562,142 +563,170 @@ void CSlideShowDlg::OnExit()
 
 void CSlideShowDlg::OnUpdateRescanFolder(CCmdUI *pCmdUI)
 {
-	pCmdUI->Enable(!m_Picture.GetFolder().IsEmpty());
+	if (pCmdUI)
+		pCmdUI->Enable(!m_Picture.GetFolder().IsEmpty());
 }
 
 void CSlideShowDlg::OnUpdateCloseFolder(CCmdUI *pCmdUI)
 {
-	pCmdUI->Enable(!m_Picture.GetFolder().IsEmpty());
+	if (pCmdUI)
+		pCmdUI->Enable(!m_Picture.GetFolder().IsEmpty());
 }
 
 void CSlideShowDlg::OnUpdatePlay(CCmdUI *pCmdUI)
 {
-	pCmdUI->Enable(!m_Picture.GetFolder().IsEmpty() && !m_Picture.IsPlaying());
+	if (pCmdUI)
+		pCmdUI->Enable(!m_Picture.GetFolder().IsEmpty() && !m_Picture.IsPlaying());
 }
 
 void CSlideShowDlg::OnUpdatePause(CCmdUI *pCmdUI)
 {
-	pCmdUI->Enable(m_Picture.IsPlaying());
+	if (pCmdUI)
+		pCmdUI->Enable(m_Picture.IsPlaying());
 }
 
 void CSlideShowDlg::OnUpdateFullScreen(CCmdUI *pCmdUI)
 {
-	pCmdUI->SetCheck(!(GetStyle() & WS_SIZEBOX));
+	if (pCmdUI)
+		pCmdUI->SetCheck(!(GetStyle() & WS_SIZEBOX));
 }
 
 void CSlideShowDlg::OnUpdateStretchToFit(CCmdUI* pCmdUI)
 {
-	pCmdUI->SetCheck(m_Picture.GetStretchToFit());
+	if (pCmdUI)
+		pCmdUI->SetCheck(m_Picture.GetStretchToFit());
 }
 
 void CSlideShowDlg::OnUpdateItemsShuffle(CCmdUI *pCmdUI)
 {
-	pCmdUI->SetCheck(m_Picture.GetShuffleItems());
+	if (pCmdUI)
+		pCmdUI->SetCheck(m_Picture.GetShuffleItems());
 }
 
 void CSlideShowDlg::OnUpdateItemsLoop(CCmdUI *pCmdUI)
 {
-	pCmdUI->SetCheck(m_Picture.GetLoopItems());
+	if (pCmdUI)
+		pCmdUI->SetCheck(m_Picture.GetLoopItems());
 }
 
 void CSlideShowDlg::OnUpdateItemsNext(CCmdUI *pCmdUI)
 {
-	pCmdUI->Enable(m_Picture.GetLoopItems() || !m_Picture.IsLastItem());
+	if (pCmdUI)
+		pCmdUI->Enable(m_Picture.GetLoopItems() || !m_Picture.IsLastItem());
 }
 
 void CSlideShowDlg::OnUpdateItemsPrevious(CCmdUI *pCmdUI)
 {
-	pCmdUI->Enable(m_Picture.GetLoopItems() || !m_Picture.IsFirstItem());
+	if (pCmdUI)
+		pCmdUI->Enable(m_Picture.GetLoopItems() || !m_Picture.IsFirstItem());
 }
 
 void CSlideShowDlg::OnUpdateItemsHome(CCmdUI *pCmdUI)
 {
-	pCmdUI->Enable(!m_Picture.IsFirstItem());
+	if (pCmdUI)
+		pCmdUI->Enable(!m_Picture.IsFirstItem());
 }
 
 void CSlideShowDlg::OnUpdateItemsReshuffle(CCmdUI *pCmdUI)
 {
-	pCmdUI->Enable(m_Picture.HasItems());
+	if (pCmdUI)
+		pCmdUI->Enable(m_Picture.HasItems());
 }
 
 void CSlideShowDlg::OnUpdateSubitemsShuffle(CCmdUI *pCmdUI)
 {
-	pCmdUI->SetCheck(m_Picture.GetShuffleSubitems());
+	if (pCmdUI)
+		pCmdUI->SetCheck(m_Picture.GetShuffleSubitems());
 }
 
 void CSlideShowDlg::OnUpdateSubitemsLoop(CCmdUI *pCmdUI)
 {
-	pCmdUI->SetCheck(m_Picture.GetLoopSubitems());
+	if (pCmdUI)
+		pCmdUI->SetCheck(m_Picture.GetLoopSubitems());
 }
 
 void CSlideShowDlg::OnUpdateSubitemsNext(CCmdUI *pCmdUI)
 {
-	pCmdUI->Enable(m_Picture.GetLoopSubitems() || !m_Picture.IsLastSubitem());
+	if (pCmdUI)
+		pCmdUI->Enable(m_Picture.GetLoopSubitems() || !m_Picture.IsLastSubitem());
 }
 
 void CSlideShowDlg::OnUpdateSubitemsPrevious(CCmdUI *pCmdUI)
 {
-	pCmdUI->Enable(m_Picture.GetLoopSubitems() || !m_Picture.IsFirstSubitem());
+	if (pCmdUI)
+		pCmdUI->Enable(m_Picture.GetLoopSubitems() || !m_Picture.IsFirstSubitem());
 }
 
 void CSlideShowDlg::OnUpdateSubitemsHome(CCmdUI *pCmdUI)
 {
-	pCmdUI->Enable(!m_Picture.IsFirstSubitem());
+	if (pCmdUI)
+		pCmdUI->Enable(!m_Picture.IsFirstSubitem());
 }
 
 void CSlideShowDlg::OnUpdateSubitemsReshuffle(CCmdUI *pCmdUI)
 {
-	pCmdUI->Enable(m_Picture.HasSubitems());
+	if (pCmdUI)
+		pCmdUI->Enable(m_Picture.HasSubitems());
 }
 
 void CSlideShowDlg::OnUpdateAllHome(CCmdUI *pCmdUI)
 {
-	pCmdUI->Enable(m_Picture.HasItems());
+	if (pCmdUI)
+		pCmdUI->Enable(m_Picture.HasItems());
 }
 
 void CSlideShowDlg::OnUpdateAllReshuffle(CCmdUI *pCmdUI)
 {
-	pCmdUI->Enable(m_Picture.HasItems());
+	if (pCmdUI)
+		pCmdUI->Enable(m_Picture.HasItems());
 }
 
 void CSlideShowDlg::OnUpdateSlideShowItems(CCmdUI *pCmdUI)
 {
-	pCmdUI->SetRadio(m_Picture.GetSlideShowType() == CSlideShowCtrl::Items);
+	if (pCmdUI)
+		pCmdUI->SetRadio(m_Picture.GetSlideShowType() == CSlideShowCtrl::Items);
 }
 
 void CSlideShowDlg::OnUpdateSlideShowSubitems(CCmdUI *pCmdUI)
 {
-	pCmdUI->SetRadio(m_Picture.GetSlideShowType() == CSlideShowCtrl::Subitems);
+	if (pCmdUI)
+		pCmdUI->SetRadio(m_Picture.GetSlideShowType() == CSlideShowCtrl::Subitems);
 }
 
 void CSlideShowDlg::OnUpdateSlideShowSpeedSlow(CCmdUI *pCmdUI)
 {
-	pCmdUI->SetRadio(m_Picture.GetSlideShowSpeed() == CSlideShowCtrl::Slow);
+	if (pCmdUI)
+		pCmdUI->SetRadio(m_Picture.GetSlideShowSpeed() == CSlideShowCtrl::Slow);
 }
 
 void CSlideShowDlg::OnUpdateSlideShowSpeedMedium(CCmdUI *pCmdUI)
 {
-	pCmdUI->SetRadio(m_Picture.GetSlideShowSpeed() == CSlideShowCtrl::Medium);
+	if (pCmdUI)
+		pCmdUI->SetRadio(m_Picture.GetSlideShowSpeed() == CSlideShowCtrl::Medium);
 }
 
 void CSlideShowDlg::OnUpdateSlideShowSpeedFast(CCmdUI *pCmdUI)
 {
-	pCmdUI->SetRadio(m_Picture.GetSlideShowSpeed() == CSlideShowCtrl::Fast);
+	if (pCmdUI)
+		pCmdUI->SetRadio(m_Picture.GetSlideShowSpeed() == CSlideShowCtrl::Fast);
 }
 
 void CSlideShowDlg::OnUpdateOpenFile(CCmdUI *pCmdUI)
 {
-	pCmdUI->Enable(!m_Picture.GetCurrentFileName().IsEmpty());
+	if (pCmdUI)
+		pCmdUI->Enable(!m_Picture.GetCurrentFileName().IsEmpty());
 }
 
 void CSlideShowDlg::OnUpdateOpenFileLocation(CCmdUI *pCmdUI)
 {
-	pCmdUI->Enable(!m_Picture.GetCurrentFileName().IsEmpty());
+	if (pCmdUI)
+		pCmdUI->Enable(!m_Picture.GetCurrentFileName().IsEmpty());
 }
 
 void CSlideShowDlg::OnUpdateProperties(CCmdUI *pCmdUI)
 {
-	pCmdUI->Enable(!m_Picture.GetCurrentFileName().IsEmpty());
+	if (pCmdUI)
+		pCmdUI->Enable(!m_Picture.GetCurrentFileName().IsEmpty());
 }
 
 INT CALLBACK CSlideShowDlg::BrowseCallbackProc(HWND hwnd, UINT uMsg, LPARAM lp, LPARAM pData)
@@ -707,7 +736,9 @@ INT CALLBACK CSlideShowDlg::BrowseCallbackProc(HWND hwnd, UINT uMsg, LPARAM lp, 
 	case BFFM_INITIALIZED: 
 		// WParam is TRUE since you are passing a path.
 		// It would be FALSE if you were passing a pidl.
-		::SendMessage(hwnd, BFFM_SETSELECTION, TRUE, (LPARAM)m_Picture.GetFolder().GetString());
+		::SendMessage(hwnd, BFFM_SETSELECTION, TRUE, reinterpret_cast<LPARAM>(m_Picture.GetFolder().GetString()));
+		break;
+	default:
 		break;
 	}
 	return 0;

@@ -9,7 +9,7 @@
 // CSlideShowCtrl
 
 IMPLEMENT_SERIAL(CSlideShowCtrl, CObject, 1)
-CSlideShowCtrl::CSlideShowCtrl()
+CSlideShowCtrl::CSlideShowCtrl() noexcept
 : m_CurImage(NULL)
 , m_Playing(FALSE)
 , m_StretchToFit(FALSE)
@@ -19,10 +19,6 @@ CSlideShowCtrl::CSlideShowCtrl()
 , m_LoopSubitems(FALSE)
 , m_SlideShowType(Items)
 , m_SlideShowSpeed(Medium)
-{
-}
-
-CSlideShowCtrl::~CSlideShowCtrl()
 {
 }
 
@@ -59,9 +55,9 @@ void CSlideShowCtrl::Serialize(CArchive& ar)
 		ar >> m_LoopItems;
 		ar >> m_LoopSubitems;
 		ar >> Enum;
-		m_SlideShowType = (SlideShowType)Enum;
+		m_SlideShowType = static_cast<SlideShowType>(Enum);
 		ar >> Enum;
-		m_SlideShowSpeed = (SlideShowSpeed)Enum;
+		m_SlideShowSpeed = static_cast<SlideShowSpeed>(Enum);
 	}
 
 	m_Items.Serialize(ar);
@@ -126,7 +122,7 @@ void CSlideShowCtrl::DisplayCurrentImage()
 
 void CSlideShowCtrl::Start()
 {
-	UINT Interval;
+	UINT Interval{};
 
 	switch (m_SlideShowSpeed)
 	{
@@ -166,7 +162,7 @@ void CSlideShowCtrl::Stop()
 	m_Playing = FALSE;
 }
 
-BOOL CSlideShowCtrl::IsPlaying()
+BOOL CSlideShowCtrl::IsPlaying() const noexcept
 {
 	return m_Playing;
 }
@@ -179,7 +175,7 @@ void CSlideShowCtrl::SetStretchToFit(BOOL Stretch)
 	UpdateWindow();
 }
 
-BOOL CSlideShowCtrl::GetStretchToFit()
+BOOL CSlideShowCtrl::GetStretchToFit() const noexcept
 {
 	return m_StretchToFit;
 }
@@ -192,7 +188,7 @@ void CSlideShowCtrl::SetShuffleItems(BOOL Shuffle)
 	DisplayCurrentImage();
 }
 
-BOOL CSlideShowCtrl::GetShuffleItems()
+BOOL CSlideShowCtrl::GetShuffleItems() const noexcept
 {
 	return m_ShuffleItems;
 }
@@ -205,27 +201,27 @@ void CSlideShowCtrl::SetShuffleSubitems(BOOL Shuffle)
 	DisplayCurrentImage();
 }
 
-BOOL CSlideShowCtrl::GetShuffleSubitems()
+BOOL CSlideShowCtrl::GetShuffleSubitems() const noexcept
 {
 	return m_ShuffleSubitems;
 }
 
-void CSlideShowCtrl::SetLoopItems(BOOL Loop)
+void CSlideShowCtrl::SetLoopItems(BOOL Loop) noexcept
 {
 	m_LoopItems = Loop;
 }
 
-BOOL CSlideShowCtrl::GetLoopItems()
+BOOL CSlideShowCtrl::GetLoopItems() const noexcept
 {
 	return m_LoopItems;
 }
 
-void CSlideShowCtrl::SetLoopSubitems(BOOL Loop)
+void CSlideShowCtrl::SetLoopSubitems(BOOL Loop) noexcept
 {
 	m_LoopSubitems = Loop;
 }
 
-BOOL CSlideShowCtrl::GetLoopSubitems()
+BOOL CSlideShowCtrl::GetLoopSubitems() const noexcept
 {
 	return m_LoopSubitems;
 }
@@ -348,12 +344,12 @@ BOOL CSlideShowCtrl::IsLastSubitem()
 	return m_Items.IsLastItem(1);
 }
 
-void CSlideShowCtrl::SetSlideShowType(SlideShowType type)
+void CSlideShowCtrl::SetSlideShowType(SlideShowType type) noexcept
 {
 	m_SlideShowType = type;
 }
 
-CSlideShowCtrl::SlideShowType CSlideShowCtrl::GetSlideShowType()
+CSlideShowCtrl::SlideShowType CSlideShowCtrl::GetSlideShowType() const noexcept
 {
 	return m_SlideShowType;
 }
@@ -369,7 +365,7 @@ void CSlideShowCtrl::SetSlideShowSpeed(SlideShowSpeed speed)
 	}
 }
 
-CSlideShowCtrl::SlideShowSpeed CSlideShowCtrl::GetSlideShowSpeed()
+CSlideShowCtrl::SlideShowSpeed CSlideShowCtrl::GetSlideShowSpeed() const noexcept
 {
 	return m_SlideShowSpeed;
 }
@@ -405,7 +401,7 @@ void CSlideShowCtrl::OnPaint()
 	MemDC.CreateCompatibleDC(&dc);
 	CBitmap Bmp;
 	Bmp.CreateCompatibleBitmap(&dc, Rect.Width(), Rect.Height());
-	int SavedDC = MemDC.SaveDC();
+	const int SavedDC = MemDC.SaveDC();
 	MemDC.SelectObject(&Bmp);
 
 	MemDC.FillSolidRect(Rect, RGB(0, 0, 0));
@@ -413,23 +409,23 @@ void CSlideShowCtrl::OnPaint()
 	if (m_CurImage != NULL)
 	{
 		double Ratio = 1.0;
-		if (m_StretchToFit || m_CurImage->GetWidth() > (UINT)Rect.Width())
+		if (m_StretchToFit || static_cast<long long>(m_CurImage->GetWidth()) > Rect.Width())
 		{
-			Ratio = (double)Rect.Width() / (double)m_CurImage->GetWidth();
+			Ratio = static_cast<double>(Rect.Width()) / static_cast<double>(m_CurImage->GetWidth());
 		}
-		if (m_StretchToFit || m_CurImage->GetHeight() > (UINT)Rect.Height())
+		if (m_StretchToFit || static_cast<long long>(m_CurImage->GetHeight()) > Rect.Height())
 		{
-			double Temp = Rect.Height() / (double)m_CurImage->GetHeight();
+			const double Temp = Rect.Height() / static_cast<double>(m_CurImage->GetHeight());
 			if (Temp < Ratio)
 			{
 				Ratio = Temp;
 			}
 		}
-		int X = (int)(Rect.Width() - (m_CurImage->GetWidth()*Ratio)) / 2;
-		int Y = (int)(Rect.Height() - (m_CurImage->GetHeight()*Ratio)) / 2;
+		const int X = static_cast<int>(Rect.Width() - (m_CurImage->GetWidth()*Ratio)) / 2;
+		const int Y = static_cast<int>(Rect.Height() - (m_CurImage->GetHeight()*Ratio)) / 2;
 
 		Graphics TheDC(MemDC.GetSafeHdc());
-		TheDC.DrawImage(m_CurImage, X, Y, (INT)(m_CurImage->GetWidth()*Ratio), (INT)(m_CurImage->GetHeight()*Ratio));
+		TheDC.DrawImage(m_CurImage, X, Y, static_cast<INT>(m_CurImage->GetWidth()*Ratio), static_cast<INT>(m_CurImage->GetHeight()*Ratio));
 	}
 
 	dc.BitBlt(0, 0, Rect.Width(), Rect.Height(), &MemDC, 0, 0, SRCCOPY);

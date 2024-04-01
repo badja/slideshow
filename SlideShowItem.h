@@ -1,4 +1,5 @@
 #pragma once
+#include <span>
 
 // CSlideShowItem command target
 
@@ -7,8 +8,7 @@ class CSlideShowItem : public CObject
 public:
 	DECLARE_SERIAL(CSlideShowItem)
 
-	CSlideShowItem();
-	virtual ~CSlideShowItem();
+	CSlideShowItem() noexcept;
 
 	virtual void Serialize(CArchive& ar);
 
@@ -30,7 +30,7 @@ public:
 private:
 	void SetItem(CString Path, CString FileName, BOOL IsDirectory);
 	void ShufflePositions();
-	INT_PTR GetCurrentPosition();
+	INT_PTR GetCurrentPosition() const noexcept;
 	CSlideShowItem* GetCurrentSubitem();
 
 	CString m_FileName;
@@ -44,6 +44,10 @@ private:
 template<class TYPE>
 void AFXAPI SerializeElements(CArchive& ar, CSlideShowItem* pElements, INT_PTR nCount)
 {
-	for (INT_PTR i = 0; i < nCount; i++, pElements++)
-		pElements->Serialize(ar);
+	if (!pElements)
+		return;
+
+	std::span Elements{ pElements, static_cast<UINT>(nCount) };
+	for (auto& e : Elements)
+		e.Serialize(ar);
 }

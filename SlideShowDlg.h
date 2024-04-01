@@ -11,7 +11,7 @@ class CSlideShowDlg : public CDialog
 {
 // Construction
 public:
-	CSlideShowDlg(CWnd* pParent = NULL);	// standard constructor
+	CSlideShowDlg(CWnd* pParent);	// standard constructor
 
 // Dialog Data
 	enum { IDD = IDD_SLIDESHOW_DIALOG };
@@ -32,7 +32,7 @@ protected:
 	virtual BOOL OnInitDialog();
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	afx_msg void OnPaint();
-	afx_msg HCURSOR OnQueryDragIcon();
+	afx_msg HCURSOR OnQueryDragIcon() noexcept;
 	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnContextMenu(CWnd* /*pWnd*/, CPoint /*point*/);
@@ -46,7 +46,7 @@ protected:
 	afx_msg void OnFullScreen();
 	afx_msg void OnStretchToFit();
 	afx_msg void OnItemsShuffle();
-	afx_msg void OnItemsLoop();
+	afx_msg void OnItemsLoop() noexcept;
 	afx_msg void OnItemsNext();
 	afx_msg void OnItemsNextAlt();
 	afx_msg void OnItemsPrevious();
@@ -54,7 +54,7 @@ protected:
 	afx_msg void OnItemsHome();
 	afx_msg void OnItemsReshuffle();
 	afx_msg void OnSubitemsShuffle();
-	afx_msg void OnSubitemsLoop();
+	afx_msg void OnSubitemsLoop() noexcept;
 	afx_msg void OnSubitemsNext();
 	afx_msg void OnSubitemsNextAlt();
 	afx_msg void OnSubitemsPrevious();
@@ -63,8 +63,8 @@ protected:
 	afx_msg void OnSubitemsReshuffle();
 	afx_msg void OnAllHome();
 	afx_msg void OnAllReshuffle();
-	afx_msg void OnSlideShowItems();
-	afx_msg void OnSlideShowSubitems();
+	afx_msg void OnSlideShowItems() noexcept;
+	afx_msg void OnSlideShowSubitems() noexcept;
 	afx_msg void OnSlideShowSpeedSlow();
 	afx_msg void OnSlideShowSpeedMedium();
 	afx_msg void OnSlideShowSpeedFast();

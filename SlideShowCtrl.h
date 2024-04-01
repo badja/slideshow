@@ -13,8 +13,7 @@ public:
 	enum SlideShowType {Items, Subitems};
 	enum SlideShowSpeed {Slow, Medium, Fast};
 
-	CSlideShowCtrl();
-	virtual ~CSlideShowCtrl();
+	CSlideShowCtrl() noexcept;
 
 	virtual void Serialize(CArchive& ar);
 
@@ -25,17 +24,17 @@ public:
 	void DisplayCurrentImage();
 	void Start();
 	void Stop();
-	BOOL IsPlaying();
+	BOOL IsPlaying() const noexcept;
 	void SetStretchToFit(BOOL Stretch);
-	BOOL GetStretchToFit();
+	BOOL GetStretchToFit() const noexcept;
 	void SetShuffleItems(BOOL Shuffle);
-	BOOL GetShuffleItems();
+	BOOL GetShuffleItems() const noexcept;
 	void SetShuffleSubitems(BOOL Shuffle);
-	BOOL GetShuffleSubitems();
-	void SetLoopItems(BOOL Loop);
-	BOOL GetLoopItems();
-	void SetLoopSubitems(BOOL Loop);
-	BOOL GetLoopSubitems();
+	BOOL GetShuffleSubitems() const noexcept;
+	void SetLoopItems(BOOL Loop) noexcept;
+	BOOL GetLoopItems() const noexcept;
+	void SetLoopSubitems(BOOL Loop) noexcept;
+	BOOL GetLoopSubitems() const noexcept;
 	void NextItem(BOOL UseShuffleSetting);
 	void PreviousItem(BOOL UseShuffleSetting);
 	void NextSubitem(BOOL UseShuffleSetting);
@@ -52,17 +51,17 @@ public:
 	BOOL HasSubitems();
 	BOOL IsFirstSubitem();
 	BOOL IsLastSubitem();
-	void SetSlideShowType(SlideShowType type);
-	SlideShowType GetSlideShowType();
+	void SetSlideShowType(SlideShowType type) noexcept;
+	SlideShowType GetSlideShowType() const noexcept;
 	void SetSlideShowSpeed(SlideShowSpeed speed);
-	SlideShowSpeed GetSlideShowSpeed();
+	SlideShowSpeed GetSlideShowSpeed() const noexcept;
 protected:
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnPaint();
 	DECLARE_MESSAGE_MAP()
 
 private:
-	Image *m_CurImage;
+	Image* m_CurImage;
 	CSlideShowItem m_Items;
 	BOOL m_Playing;
 	BOOL m_StretchToFit;
