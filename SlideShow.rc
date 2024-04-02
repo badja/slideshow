@@ -187,7 +187,7 @@ BEGIN
         MENUITEM "&Full screen\tF11",           ID_FULL_SCREEN
         MENUITEM "Stretch to fit",              ID_STRETCH_TO_FIT
         MENUITEM SEPARATOR
-        POPUP "Al&bums"
+        POPUP "&Items"
         BEGIN
             MENUITEM "&Shuffle",                    ID_ITEMS_SHUFFLE
             MENUITEM "&Loop",                       ID_ITEMS_LOOP
@@ -197,7 +197,7 @@ BEGIN
             MENUITEM "&Home",                       ID_ITEMS_HOME
             MENUITEM "&Reshuffle",                  ID_ITEMS_RESHUFFLE
         END
-        POPUP "P&hotos"
+        POPUP "&Subitems"
         BEGIN
             MENUITEM "&Shuffle",                    ID_SUBITEMS_SHUFFLE
             MENUITEM "&Loop",                       ID_SUBITEMS_LOOP
@@ -213,8 +213,8 @@ BEGIN
             MENUITEM "&Reshuffle",                  ID_ALL_RESHUFFLE
         END
         MENUITEM SEPARATOR
-        MENUITEM "Slide Show - Alb&ums",            ID_SLIDE_SHOW_ITEMS
-        MENUITEM "Slide Show - Photo&s",            ID_SLIDE_SHOW_SUBITEMS
+        MENUITEM "Slide Show - Ite&ms",             ID_SLIDE_SHOW_ITEMS
+        MENUITEM "Slide Show - S&ubitems",          ID_SLIDE_SHOW_SUBITEMS
         POPUP "Slide Show - Spee&d"
         BEGIN
             MENUITEM "&Slow",                       ID_SLIDE_SHOW_SPEED_SLOW
