@@ -44,6 +44,8 @@ protected:
 	afx_msg void OnPause();
 	afx_msg void OnPlayPause();
 	afx_msg void OnFullScreen();
+	afx_msg void OnZoomIn();
+	afx_msg void OnZoomOut();
 	afx_msg void OnStretchToFit();
 	afx_msg void OnItemsShuffle();
 	afx_msg void OnItemsLoop() noexcept;
@@ -77,6 +79,8 @@ protected:
 	afx_msg void OnUpdatePlay(CCmdUI *pCmdUI);
 	afx_msg void OnUpdatePause(CCmdUI *pCmdUI);
 	afx_msg void OnUpdateFullScreen(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateZoomIn(CCmdUI* pCmdUI);
+	afx_msg void OnUpdateZoomOut(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateStretchToFit(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateItemsShuffle(CCmdUI *pCmdUI);
 	afx_msg void OnUpdateItemsLoop(CCmdUI *pCmdUI);

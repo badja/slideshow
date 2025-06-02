@@ -42,6 +42,8 @@ BEGIN_MESSAGE_MAP(CSlideShowDlg, CDialog)
 	ON_COMMAND(ID_PAUSE, &CSlideShowDlg::OnPause)
 	ON_COMMAND(ID_PLAY_PAUSE, &CSlideShowDlg::OnPlayPause)
 	ON_COMMAND(ID_FULL_SCREEN, &CSlideShowDlg::OnFullScreen)
+	ON_COMMAND(ID_ZOOM_IN, &CSlideShowDlg::OnZoomIn)
+	ON_COMMAND(ID_ZOOM_OUT, &CSlideShowDlg::OnZoomOut)
 	ON_COMMAND(ID_STRETCH_TO_FIT, &CSlideShowDlg::OnStretchToFit)
 	ON_COMMAND(ID_ITEMS_SHUFFLE, &CSlideShowDlg::OnItemsShuffle)
 	ON_COMMAND(ID_ITEMS_LOOP, &CSlideShowDlg::OnItemsLoop)
@@ -75,6 +77,8 @@ BEGIN_MESSAGE_MAP(CSlideShowDlg, CDialog)
 	ON_UPDATE_COMMAND_UI(ID_PLAY, &CSlideShowDlg::OnUpdatePlay)
 	ON_UPDATE_COMMAND_UI(ID_PAUSE, &CSlideShowDlg::OnUpdatePause)
 	ON_UPDATE_COMMAND_UI(ID_FULL_SCREEN, &CSlideShowDlg::OnUpdateFullScreen)
+	ON_UPDATE_COMMAND_UI(ID_ZOOM_IN, &CSlideShowDlg::OnUpdateZoomIn)
+	ON_UPDATE_COMMAND_UI(ID_ZOOM_OUT, &CSlideShowDlg::OnUpdateZoomOut)
 	ON_UPDATE_COMMAND_UI(ID_STRETCH_TO_FIT, &CSlideShowDlg::OnUpdateStretchToFit)
 	ON_UPDATE_COMMAND_UI(ID_ITEMS_SHUFFLE, &CSlideShowDlg::OnUpdateItemsShuffle)
 	ON_UPDATE_COMMAND_UI(ID_ITEMS_LOOP, &CSlideShowDlg::OnUpdateItemsLoop)
@@ -400,6 +404,16 @@ void CSlideShowDlg::OnFullScreen()
 	}
 }
 
+void CSlideShowDlg::OnZoomIn()
+{
+	m_Picture.ZoomIn(1);
+}
+
+void CSlideShowDlg::OnZoomOut()
+{
+	m_Picture.ZoomOut(1);
+}
+
 void CSlideShowDlg::OnStretchToFit()
 {
 	m_Picture.SetStretchToFit(!m_Picture.GetStretchToFit());
@@ -589,6 +603,18 @@ void CSlideShowDlg::OnUpdateFullScreen(CCmdUI *pCmdUI)
 {
 	if (pCmdUI)
 		pCmdUI->SetCheck(!(GetStyle() & WS_SIZEBOX));
+}
+
+void CSlideShowDlg::OnUpdateZoomIn(CCmdUI* pCmdUI)
+{
+	if (pCmdUI)
+		pCmdUI->Enable(m_Picture.HasImage());
+}
+
+void CSlideShowDlg::OnUpdateZoomOut(CCmdUI* pCmdUI)
+{
+	if (pCmdUI)
+		pCmdUI->Enable(m_Picture.HasImage());
 }
 
 void CSlideShowDlg::OnUpdateStretchToFit(CCmdUI* pCmdUI)

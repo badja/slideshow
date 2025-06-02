@@ -22,9 +22,12 @@ public:
 	CString GetFolder();
 	CString GetCurrentFileName();
 	void DisplayCurrentImage();
+	BOOL HasImage() const noexcept;
 	void Start();
 	void Stop();
 	BOOL IsPlaying() const noexcept;
+	void ZoomIn(int Increment);
+	void ZoomOut(int Increment);
 	void SetStretchToFit(BOOL Stretch);
 	BOOL GetStretchToFit() const noexcept;
 	void SetShuffleItems(BOOL Shuffle);
@@ -58,9 +61,17 @@ public:
 protected:
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnPaint();
+	afx_msg void OnSize(UINT nType, int cx, int cy);
+	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
+	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
+	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
+	afx_msg BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
 	DECLARE_MESSAGE_MAP()
 
 private:
+	void CalcZoom();
+	void CalcDrawPoint();
+	void CalcFocusPoint();
 	Image* m_CurImage;
 	CSlideShowItem m_Items;
 	BOOL m_Playing;
@@ -71,4 +82,10 @@ private:
 	BOOL m_LoopSubitems;
 	SlideShowType m_SlideShowType;
 	SlideShowSpeed m_SlideShowSpeed;
+	double m_Zoom;
+	BOOL m_ManualZoom;
+	CPoint m_Focus;
+	CPoint m_Draw;
+	CPoint m_CapturePoint;
+	CSize m_Size;
 };

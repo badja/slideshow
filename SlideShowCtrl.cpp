@@ -19,6 +19,8 @@ CSlideShowCtrl::CSlideShowCtrl() noexcept
 , m_LoopSubitems(FALSE)
 , m_SlideShowType(Items)
 , m_SlideShowSpeed(Medium)
+, m_Zoom(1.0)
+, m_ManualZoom(FALSE)
 {
 }
 
@@ -27,6 +29,11 @@ BEGIN_MESSAGE_MAP(CSlideShowCtrl, CStatic)
 	ON_WM_TIMER()
 	ON_WM_PAINT()
 	ON_WM_ERASEBKGND()
+	ON_WM_SIZE()
+	ON_WM_LBUTTONDOWN()
+	ON_WM_LBUTTONUP()
+	ON_WM_MOUSEMOVE()
+	ON_WM_MOUSEWHEEL()
 END_MESSAGE_MAP()
 
 
@@ -116,8 +123,21 @@ void CSlideShowCtrl::DisplayCurrentImage()
 		m_CurImage = NULL;
 	}
 
+	if (HasImage())
+	{
+		CRect Rect;
+		GetClientRect(&Rect);
+
+		CalcZoom();
+		CalcDrawPoint();
+	}
+
 	Invalidate();
-	UpdateWindow();
+}
+
+BOOL CSlideShowCtrl::HasImage() const noexcept
+{
+	return m_CurImage != NULL;
 }
 
 void CSlideShowCtrl::Start()
@@ -167,12 +187,43 @@ BOOL CSlideShowCtrl::IsPlaying() const noexcept
 	return m_Playing;
 }
 
+void CSlideShowCtrl::ZoomIn(int Increment)
+{
+	if (HasImage())
+	{
+		m_Zoom = floor(m_Zoom * 10.0 + Increment) / 10.0;
+		m_Zoom = min(m_Zoom, 8.0);
+		m_ManualZoom = TRUE;
+
+		CalcDrawPoint();
+		Invalidate();
+	}
+}
+
+void CSlideShowCtrl::ZoomOut(int Increment)
+{
+	if (HasImage())
+	{
+		m_Zoom = ceil(m_Zoom * 10.0 - Increment) / 10.0;
+		m_Zoom = max(m_Zoom, 0.01);
+		m_ManualZoom = TRUE;
+
+		CalcDrawPoint();
+		Invalidate();
+	}
+}
+
 void CSlideShowCtrl::SetStretchToFit(BOOL Stretch)
 {
 	m_StretchToFit = Stretch;
 
-	Invalidate();
-	UpdateWindow();
+	if (HasImage())
+	{
+		CalcZoom();
+		CalcDrawPoint();
+
+		Invalidate();
+	}
 }
 
 BOOL CSlideShowCtrl::GetStretchToFit() const noexcept
@@ -406,28 +457,166 @@ void CSlideShowCtrl::OnPaint()
 
 	MemDC.FillSolidRect(Rect, RGB(0, 0, 0));
 
-	if (m_CurImage != NULL)
+	if (HasImage())
 	{
-		double Ratio = 1.0;
-		if (m_StretchToFit || static_cast<long long>(m_CurImage->GetWidth()) > Rect.Width())
-		{
-			Ratio = static_cast<double>(Rect.Width()) / static_cast<double>(m_CurImage->GetWidth());
-		}
-		if (m_StretchToFit || static_cast<long long>(m_CurImage->GetHeight()) > Rect.Height())
-		{
-			const double Temp = Rect.Height() / static_cast<double>(m_CurImage->GetHeight());
-			if (Temp < Ratio)
-			{
-				Ratio = Temp;
-			}
-		}
-		const int X = static_cast<int>(Rect.Width() - (m_CurImage->GetWidth()*Ratio)) / 2;
-		const int Y = static_cast<int>(Rect.Height() - (m_CurImage->GetHeight()*Ratio)) / 2;
-
 		Graphics TheDC(MemDC.GetSafeHdc());
-		TheDC.DrawImage(m_CurImage, X, Y, static_cast<INT>(m_CurImage->GetWidth()*Ratio), static_cast<INT>(m_CurImage->GetHeight()*Ratio));
+		TheDC.DrawImage(m_CurImage, m_Draw.x, m_Draw.y, static_cast<INT>(m_CurImage->GetWidth()*m_Zoom), static_cast<INT>(m_CurImage->GetHeight()*m_Zoom));
 	}
 
 	dc.BitBlt(0, 0, Rect.Width(), Rect.Height(), &MemDC, 0, 0, SRCCOPY);
 	MemDC.RestoreDC(SavedDC);
+}
+
+void CSlideShowCtrl::OnSize(UINT nType, int cx, int cy)
+{
+	CStatic::OnSize(nType, cx, cy);
+
+	if (HasImage())
+	{
+		CRect Rect;
+		GetClientRect(&Rect);
+
+		if (m_StretchToFit || m_ManualZoom)
+		{
+			const double ImageRatio = static_cast<double>(m_CurImage->GetWidth()) / static_cast<double>(m_CurImage->GetHeight());
+			const double ViewRatio = static_cast<double>(m_Size.cx) / static_cast<double>(m_Size.cy);
+
+			if (ImageRatio > ViewRatio)
+				m_Zoom = m_Zoom * cx / m_Size.cx;
+			else
+				m_Zoom = m_Zoom * cy / m_Size.cy;
+		}
+		else
+		{
+			CalcZoom();
+		}
+
+		CalcDrawPoint();
+		Invalidate();
+	}
+
+	m_Size = CSize(cx, cy);
+}
+
+void CSlideShowCtrl::OnLButtonDown(UINT nFlags, CPoint point)
+{
+	if (HasImage())
+	{
+		SetCapture();
+		m_CapturePoint = point;
+	}
+
+	CStatic::OnLButtonDown(nFlags, point);
+}
+
+void CSlideShowCtrl::OnLButtonUp(UINT nFlags, CPoint point)
+{
+	ReleaseCapture();
+	CalcFocusPoint();
+
+	CStatic::OnLButtonUp(nFlags, point);
+}
+
+void CSlideShowCtrl::OnMouseMove(UINT nFlags, CPoint point)
+{
+	if (CWnd::GetCapture())
+	{
+		CRect Rect;
+		GetClientRect(&Rect);
+
+		const bool WidthCropped = m_CurImage->GetWidth() * m_Zoom > Rect.Width();
+		const bool HeightCropped = m_CurImage->GetHeight() * m_Zoom > Rect.Height();
+
+		if (WidthCropped)
+		{
+			m_Draw.x += point.x - m_CapturePoint.x;
+			m_Draw.x = min(m_Draw.x, 0);
+			m_Draw.x = max(m_Draw.x, static_cast<int>(Rect.Width() - m_CurImage->GetWidth() * m_Zoom));
+		}
+
+		if (HeightCropped)
+		{
+			m_Draw.y += point.y - m_CapturePoint.y;
+			m_Draw.y = min(m_Draw.y, 0);
+			m_Draw.y = max(m_Draw.y, static_cast<int>(Rect.Height() - m_CurImage->GetHeight() * m_Zoom));
+		}
+
+		m_CapturePoint = point;
+		Invalidate();
+	}
+
+	CStatic::OnMouseMove(nFlags, point);
+}
+
+BOOL CSlideShowCtrl::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
+{
+	if (zDelta > 0)
+		ZoomIn(zDelta / WHEEL_DELTA);
+	else if (zDelta < 0)
+		ZoomOut(-zDelta / WHEEL_DELTA);
+
+	return CStatic::OnMouseWheel(nFlags, zDelta, pt);
+}
+
+void CSlideShowCtrl::CalcZoom()
+{
+	CRect Rect;
+	GetClientRect(&Rect);
+
+	m_Zoom = 1.0;
+	if (m_StretchToFit || static_cast<long long>(m_CurImage->GetWidth()) > Rect.Width())
+	{
+		m_Zoom = static_cast<double>(Rect.Width()) / static_cast<double>(m_CurImage->GetWidth());
+	}
+	if (m_StretchToFit || static_cast<long long>(m_CurImage->GetHeight()) > Rect.Height())
+	{
+		m_Zoom = min(m_Zoom, static_cast<double>(Rect.Height()) / static_cast<double>(m_CurImage->GetHeight()));
+	}
+	m_ManualZoom = FALSE;
+
+	m_Focus.x = m_CurImage->GetWidth() / 2;
+	m_Focus.y = m_CurImage->GetHeight() / 2;
+}
+
+void CSlideShowCtrl::CalcDrawPoint()
+{
+	CRect Rect;
+	GetClientRect(&Rect);
+
+	const bool WidthCropped = m_CurImage->GetWidth() * m_Zoom > Rect.Width();
+	const bool HeightCropped = m_CurImage->GetHeight() * m_Zoom > Rect.Height();
+
+	if (!WidthCropped)
+		m_Focus.x = m_CurImage->GetWidth() / 2;
+
+	if (!HeightCropped)
+		m_Focus.y = m_CurImage->GetHeight() / 2;
+
+	m_Draw.x = static_cast<int>(Rect.Width() / 2.0 - m_Focus.x * m_Zoom);
+	m_Draw.y = static_cast<int>(Rect.Height() / 2.0 - m_Focus.y * m_Zoom);
+
+	const CPoint OldDraw = m_Draw;
+
+	if (WidthCropped)
+	{
+		m_Draw.x = min(m_Draw.x, 0);
+		m_Draw.x = max(m_Draw.x, static_cast<int>(Rect.Width() - m_CurImage->GetWidth() * m_Zoom));
+	}
+	if (HeightCropped)
+	{
+		m_Draw.y = min(m_Draw.y, 0);
+		m_Draw.y = max(m_Draw.y, static_cast<int>(Rect.Height() - m_CurImage->GetHeight() * m_Zoom));
+	}
+
+	if (m_Draw != OldDraw)
+		CalcFocusPoint();
+}
+
+void CSlideShowCtrl::CalcFocusPoint()
+{
+	CRect Rect;
+	GetClientRect(&Rect);
+
+	m_Focus.x = static_cast<int>((Rect.Width() / 2.0 - m_Draw.x) / m_Zoom);
+	m_Focus.y = static_cast<int>((Rect.Height() / 2.0 - m_Draw.y) / m_Zoom);
 }

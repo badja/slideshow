@@ -64,6 +64,7 @@ END
 // remains consistent on all systems.
 IDR_MAINFRAME           ICON                    "res\\SlideShow.ico"
 
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // Dialog
@@ -157,15 +158,19 @@ BEGIN
     VK_F11,         ID_FULL_SCREEN,         VIRTKEY, NOINVERT
     VK_DOWN,        ID_ITEMS_NEXT,          VIRTKEY, NOINVERT
     VK_DOWN,        ID_ITEMS_NEXT_ALT,      VIRTKEY, SHIFT, NOINVERT
-    VK_RIGHT,       ID_SUBITEMS_NEXT,       VIRTKEY, NOINVERT
-    VK_RIGHT,       ID_SUBITEMS_NEXT_ALT,   VIRTKEY, SHIFT, NOINVERT
-    "O",            ID_OPEN_FOLDER,         VIRTKEY, CONTROL, NOINVERT
-    VK_SPACE,       ID_PLAY_PAUSE,          VIRTKEY, NOINVERT
     VK_UP,          ID_ITEMS_PREVIOUS,      VIRTKEY, NOINVERT
     VK_UP,          ID_ITEMS_PREVIOUS_ALT,  VIRTKEY, SHIFT, NOINVERT
+    "O",            ID_OPEN_FOLDER,         VIRTKEY, CONTROL, NOINVERT
+    VK_SPACE,       ID_PLAY_PAUSE,          VIRTKEY, NOINVERT
+    VK_RETURN,      ID_PROPERTIES,          VIRTKEY, ALT, NOINVERT
+    VK_RIGHT,       ID_SUBITEMS_NEXT,       VIRTKEY, NOINVERT
+    VK_RIGHT,       ID_SUBITEMS_NEXT_ALT,   VIRTKEY, SHIFT, NOINVERT
     VK_LEFT,        ID_SUBITEMS_PREVIOUS,   VIRTKEY, NOINVERT
     VK_LEFT,        ID_SUBITEMS_PREVIOUS_ALT, VIRTKEY, SHIFT, NOINVERT
-    VK_RETURN,      ID_PROPERTIES,          VIRTKEY, ALT, NOINVERT
+    VK_ADD,         ID_ZOOM_IN,             VIRTKEY, CONTROL, NOINVERT
+    VK_OEM_PLUS,    ID_ZOOM_IN,             VIRTKEY, CONTROL, NOINVERT
+    VK_OEM_MINUS,   ID_ZOOM_OUT,            VIRTKEY, CONTROL, NOINVERT
+    VK_SUBTRACT,    ID_ZOOM_OUT,            VIRTKEY, CONTROL, NOINVERT
 END
 
 
@@ -185,6 +190,8 @@ BEGIN
         MENUITEM "&Play\tSpace",                ID_PLAY
         MENUITEM "&Pause\tSpace",               ID_PAUSE
         MENUITEM "&Full screen\tF11",           ID_FULL_SCREEN
+        MENUITEM "Zoom in\tCtrl++",             ID_ZOOM_IN
+        MENUITEM "Zoom out\tCtrl+-",            ID_ZOOM_OUT
         MENUITEM "Stretch to fit",              ID_STRETCH_TO_FIT
         MENUITEM SEPARATOR
         POPUP "&Items"
@@ -213,8 +220,8 @@ BEGIN
             MENUITEM "&Reshuffle",                  ID_ALL_RESHUFFLE
         END
         MENUITEM SEPARATOR
-        MENUITEM "Slide Show - Ite&ms",             ID_SLIDE_SHOW_ITEMS
-        MENUITEM "Slide Show - S&ubitems",          ID_SLIDE_SHOW_SUBITEMS
+        MENUITEM "Slide Show - Ite&ms",         ID_SLIDE_SHOW_ITEMS
+        MENUITEM "Slide Show - S&ubitems",      ID_SLIDE_SHOW_SUBITEMS
         POPUP "Slide Show - Spee&d"
         BEGIN
             MENUITEM "&Slow",                       ID_SLIDE_SHOW_SPEED_SLOW
