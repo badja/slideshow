@@ -171,6 +171,10 @@ BEGIN
     VK_OEM_PLUS,    ID_ZOOM_IN,             VIRTKEY, CONTROL, NOINVERT
     VK_OEM_MINUS,   ID_ZOOM_OUT,            VIRTKEY, CONTROL, NOINVERT
     VK_SUBTRACT,    ID_ZOOM_OUT,            VIRTKEY, CONTROL, NOINVERT
+    VK_LEFT,        ID_SCROLL_LEFT,         VIRTKEY, CONTROL, NOINVERT
+    VK_UP,          ID_SCROLL_UP,           VIRTKEY, CONTROL, NOINVERT
+    VK_RIGHT,       ID_SCROLL_RIGHT,        VIRTKEY, CONTROL, NOINVERT
+    VK_DOWN,        ID_SCROLL_DOWN,         VIRTKEY, CONTROL, NOINVERT
 END
 
 
@@ -190,9 +194,9 @@ BEGIN
         MENUITEM "&Play\tSpace",                ID_PLAY
         MENUITEM "&Pause\tSpace",               ID_PAUSE
         MENUITEM "&Full screen\tF11",           ID_FULL_SCREEN
-        MENUITEM "Zoom in\tCtrl++",             ID_ZOOM_IN
-        MENUITEM "Zoom out\tCtrl+-",            ID_ZOOM_OUT
-        MENUITEM "Stretch to fit",              ID_STRETCH_TO_FIT
+        MENUITEM "&Zoom in\tCtrl++",            ID_ZOOM_IN
+        MENUITEM "Zoom o&ut\tCtrl+-",           ID_ZOOM_OUT
+        MENUITEM "Str&etch to fit",             ID_STRETCH_TO_FIT
         MENUITEM SEPARATOR
         POPUP "&Items"
         BEGIN
@@ -221,7 +225,7 @@ BEGIN
         END
         MENUITEM SEPARATOR
         MENUITEM "Slide Show - Ite&ms",         ID_SLIDE_SHOW_ITEMS
-        MENUITEM "Slide Show - S&ubitems",      ID_SLIDE_SHOW_SUBITEMS
+        MENUITEM "Slide Show - Su&bitems",      ID_SLIDE_SHOW_SUBITEMS
         POPUP "Slide Show - Spee&d"
         BEGIN
             MENUITEM "&Slow",                       ID_SLIDE_SHOW_SPEED_SLOW
@@ -233,7 +237,7 @@ BEGIN
         MENUITEM "Open file &location",         ID_OPEN_FILE_LOCATION
         MENUITEM "Proper&ties\tAlt+Enter",      ID_PROPERTIES
         MENUITEM SEPARATOR
-        MENUITEM "&Exit\tEsc",                  ID_EXIT
+        MENUITEM "E&xit\tEsc",                  ID_EXIT
     END
 END
 

@@ -5,6 +5,10 @@
 #include "SlideShowCtrl.h"
 #include "Resource.h"
 
+constexpr double ZOOM_INCREMENT = 0.1;
+constexpr double ZOOM_MIN = 0.01;
+constexpr double ZOOM_MAX = 8.0;
+
 
 // CSlideShowCtrl
 
@@ -191,8 +195,9 @@ void CSlideShowCtrl::ZoomIn(int Increment)
 {
 	if (HasImage())
 	{
-		m_Zoom = floor(m_Zoom * 10.0 + Increment) / 10.0;
-		m_Zoom = min(m_Zoom, 8.0);
+		constexpr double Multiplier = 1.0 / ZOOM_INCREMENT;
+		m_Zoom = floor(m_Zoom * Multiplier + Increment) / Multiplier;
+		m_Zoom = min(m_Zoom, ZOOM_MAX);
 		m_ManualZoom = TRUE;
 
 		CalcDrawPoint();
@@ -204,13 +209,50 @@ void CSlideShowCtrl::ZoomOut(int Increment)
 {
 	if (HasImage())
 	{
-		m_Zoom = ceil(m_Zoom * 10.0 - Increment) / 10.0;
-		m_Zoom = max(m_Zoom, 0.01);
+		constexpr double Multiplier = 1.0 / ZOOM_INCREMENT;
+		m_Zoom = ceil(m_Zoom * Multiplier - Increment) / Multiplier;
+		m_Zoom = max(m_Zoom, ZOOM_MIN);
 		m_ManualZoom = TRUE;
 
 		CalcDrawPoint();
 		Invalidate();
 	}
+}
+
+BOOL CSlideShowCtrl::CanZoomIn() const noexcept
+{
+	return HasImage() && m_Zoom < ZOOM_MAX;
+}
+
+BOOL CSlideShowCtrl::CanZoomOut() const noexcept
+{
+	return HasImage() && m_Zoom > ZOOM_MIN;
+}
+
+void CSlideShowCtrl::Scroll(int DeltaX, int DeltaY)
+{
+	CRect Rect;
+	GetClientRect(&Rect);
+
+	const bool WidthCropped = m_CurImage->GetWidth() * m_Zoom > Rect.Width();
+	const bool HeightCropped = m_CurImage->GetHeight() * m_Zoom > Rect.Height();
+
+	if (WidthCropped)
+	{
+		m_Draw.x -= DeltaX;
+		m_Draw.x = min(m_Draw.x, 0);
+		m_Draw.x = max(m_Draw.x, static_cast<int>(Rect.Width() - m_CurImage->GetWidth() * m_Zoom));
+	}
+
+	if (HeightCropped)
+	{
+		m_Draw.y -= DeltaY;
+		m_Draw.y = min(m_Draw.y, 0);
+		m_Draw.y = max(m_Draw.y, static_cast<int>(Rect.Height() - m_CurImage->GetHeight() * m_Zoom));
+	}
+
+	CalcFocusPoint();
+	Invalidate();
 }
 
 void CSlideShowCtrl::SetStretchToFit(BOOL Stretch)
@@ -521,28 +563,8 @@ void CSlideShowCtrl::OnMouseMove(UINT nFlags, CPoint point)
 {
 	if (CWnd::GetCapture())
 	{
-		CRect Rect;
-		GetClientRect(&Rect);
-
-		const bool WidthCropped = m_CurImage->GetWidth() * m_Zoom > Rect.Width();
-		const bool HeightCropped = m_CurImage->GetHeight() * m_Zoom > Rect.Height();
-
-		if (WidthCropped)
-		{
-			m_Draw.x += point.x - m_CapturePoint.x;
-			m_Draw.x = min(m_Draw.x, 0);
-			m_Draw.x = max(m_Draw.x, static_cast<int>(Rect.Width() - m_CurImage->GetWidth() * m_Zoom));
-		}
-
-		if (HeightCropped)
-		{
-			m_Draw.y += point.y - m_CapturePoint.y;
-			m_Draw.y = min(m_Draw.y, 0);
-			m_Draw.y = max(m_Draw.y, static_cast<int>(Rect.Height() - m_CurImage->GetHeight() * m_Zoom));
-		}
-
+		Scroll(m_CapturePoint.x - point.x, m_CapturePoint.y - point.y);
 		m_CapturePoint = point;
-		Invalidate();
 	}
 
 	CStatic::OnMouseMove(nFlags, point);

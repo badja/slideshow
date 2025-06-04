@@ -28,6 +28,9 @@ public:
 	BOOL IsPlaying() const noexcept;
 	void ZoomIn(int Increment);
 	void ZoomOut(int Increment);
+	BOOL CanZoomIn() const noexcept;
+	BOOL CanZoomOut() const noexcept;
+	void Scroll(int DeltaX, int DeltaY);
 	void SetStretchToFit(BOOL Stretch);
 	BOOL GetStretchToFit() const noexcept;
 	void SetShuffleItems(BOOL Shuffle);

@@ -44,13 +44,17 @@
 #define ID_STRETCH_TO_FIT               32806
 #define ID_ZOOM_IN                      32807
 #define ID_ZOOM_OUT                     32808
+#define ID_SCROLL_LEFT                  32809
+#define ID_SCROLL_UP                    32810
+#define ID_SCROLL_RIGHT                 32811
+#define ID_SCROLL_DOWN                  32812
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        131
-#define _APS_NEXT_COMMAND_VALUE         32809
+#define _APS_NEXT_COMMAND_VALUE         32813
 #define _APS_NEXT_CONTROL_VALUE         1005
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

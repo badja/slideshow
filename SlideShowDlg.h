@@ -46,6 +46,10 @@ protected:
 	afx_msg void OnFullScreen();
 	afx_msg void OnZoomIn();
 	afx_msg void OnZoomOut();
+	afx_msg void OnScrollLeft();
+	afx_msg void OnScrollUp();
+	afx_msg void OnScrollRight();
+	afx_msg void OnScrollDown();
 	afx_msg void OnStretchToFit();
 	afx_msg void OnItemsShuffle();
 	afx_msg void OnItemsLoop() noexcept;
